@@ -77,8 +77,9 @@ resource "aws_security_group" "instance_sg" {
   }
 }
 
-## ECS
-
+##
+# ECS
+##
 resource "aws_ecs_cluster" "main" {
   name = "terraform_example_ecs_cluster"
 }
@@ -120,17 +121,17 @@ data "template_file" "task_definition" {
 # Autoscaling
 resource "aws_autoscaling_group" "main" {
   name                 = "main"
-  vpc_zone_identifier  = ["${aws_subnet.main.*.id}"]
-  min_size             = 2
-  max_size             = 2
-  desired_capacity     = 2
+  vpc_zone_identifier  = ["${aws_subnet.public.*.id}"]
+  min_size             = 1
+  max_size             = 1
+  desired_capacity     = 1
   launch_configuration = "${aws_launch_configuration.app.name}"
 }
 
 ## ALB
 resource "aws_alb" "main" {
-  name            = "tf-example-alb-ecs"
-  subnets         = ["${aws_subnet.main.*.id}"]
+  name            = "main"
+  subnets         = ["${aws_subnet.public.*.id}"]
   security_groups = ["${aws_security_group.lb_sg.id}"]
 }
 
