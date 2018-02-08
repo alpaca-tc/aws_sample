@@ -1,4 +1,4 @@
-resource "aws_launch_configuration" "app" {
+resource "aws_launch_configuration" "ecs" {
   security_groups = [
     "${aws_security_group.instance_sg.id}",
   ]
@@ -123,38 +123,7 @@ resource "aws_autoscaling_group" "main" {
   name                 = "main"
   vpc_zone_identifier  = ["${aws_subnet.public.*.id}"]
   min_size             = 1
-  max_size             = 1
-  desired_capacity     = 1
-  launch_configuration = "${aws_launch_configuration.app.name}"
-}
-
-## ALB
-resource "aws_alb" "main" {
-  name            = "main"
-  subnets         = ["${aws_subnet.public.*.id}"]
-  security_groups = ["${aws_security_group.lb_sg.id}"]
-}
-
-resource "aws_alb_target_group" "rails" {
-  name     = "rails"
-  port     = 3000
-  protocol = "HTTP"
-  vpc_id   = "${aws_vpc.main.id}"
-
-  health_check {
-    path     = "/"
-    protocol = "HTTP"
-    matcher  = "200"
-  }
-}
-
-resource "aws_alb_listener" "front_end" {
-  load_balancer_arn = "${aws_alb.main.id}"
-  port              = "3000"
-  protocol          = "HTTP"
-
-  default_action {
-    target_group_arn = "${aws_alb_target_group.rails.id}"
-    type             = "forward"
-  }
+  max_size             = 2
+  desired_capacity     = 2
+  launch_configuration = "${aws_launch_configuration.ecs.name}"
 }

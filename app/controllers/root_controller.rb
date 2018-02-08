@@ -1,5 +1,5 @@
 class RootController < ApplicationController
   def index
-    render plain: 'Hello World'
+    render plain: 'Hello World 01'
   end
 end
