@@ -1,33 +1,3 @@
-resource "aws_vpc" "main" {
-  cidr_block = "10.10.0.0/16"
-}
-
-resource "aws_subnet" "main" {
-  count             = "${var.az_count}"
-  cidr_block        = "${cidrsubnet(aws_vpc.main.cidr_block, 8, count.index)}"
-  availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
-  vpc_id            = "${aws_vpc.main.id}"
-}
-
-resource "aws_internet_gateway" "gateway" {
-  vpc_id = "${aws_vpc.main.id}"
-}
-
-resource "aws_route_table" "application" {
-  vpc_id = "${aws_vpc.main.id}"
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = "${aws_internet_gateway.gateway.id}"
-  }
-}
-
-resource "aws_route_table_association" "a" {
-  count          = "${var.az_count}"
-  subnet_id      = "${element(aws_subnet.main.*.id, count.index)}"
-  route_table_id = "${aws_route_table.application.id}"
-}
-
 resource "aws_launch_configuration" "app" {
   security_groups = [
     "${aws_security_group.instance_sg.id}",
@@ -132,7 +102,7 @@ resource "aws_ecs_service" "rails" {
 }
 
 resource "aws_ecs_task_definition" "sample" {
-  family                = "tf_example_sample_td"
+  family                = "sample_ecs_task_definition"
   container_definitions = "${data.template_file.task_definition.rendered}"
 }
 
@@ -140,7 +110,7 @@ data "template_file" "task_definition" {
   template = "${file("${path.module}/task-definition.json")}"
 
   vars {
-    image_url        = "sample:latest"
+    image_url        = "016559158979.dkr.ecr.ap-northeast-1.amazonaws.com/sample:latest"
     container_name   = "sample"
     log_group_region = "${var.region}"
     log_group_name   = "${aws_cloudwatch_log_group.app.name}"
@@ -151,9 +121,9 @@ data "template_file" "task_definition" {
 resource "aws_autoscaling_group" "main" {
   name                 = "main"
   vpc_zone_identifier  = ["${aws_subnet.main.*.id}"]
-  min_size             = 1
-  max_size             = 1
-  desired_capacity     = 1
+  min_size             = 2
+  max_size             = 2
+  desired_capacity     = 2
   launch_configuration = "${aws_launch_configuration.app.name}"
 }
 
@@ -169,6 +139,12 @@ resource "aws_alb_target_group" "rails" {
   port     = 3000
   protocol = "HTTP"
   vpc_id   = "${aws_vpc.main.id}"
+
+  health_check {
+    path     = "/"
+    protocol = "HTTP"
+    matcher  = "200"
+  }
 }
 
 resource "aws_alb_listener" "front_end" {

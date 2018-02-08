@@ -59,7 +59,7 @@ resource "aws_iam_policy_attachment" "ecs_instance_role_attach" {
 }
 
 resource "aws_iam_instance_profile" "ecs" {
-  name  = "ecs-instance-profile"
-  path  = "/"
-  roles = ["${aws_iam_role.ecs_instance_role.name}"]
+  name = "ecs-instance-profile"
+  path = "/"
+  role = "${aws_iam_role.ecs_instance_role.name}"
 }
