@@ -3,6 +3,7 @@ resource "aws_alb" "main" {
   name            = "main"
   subnets         = ["${aws_subnet.public.*.id}"]
   security_groups = ["${aws_security_group.alb.id}"]
+  internal        = false
 }
 
 resource "aws_alb_target_group" "rails" {

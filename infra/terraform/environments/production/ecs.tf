@@ -8,7 +8,7 @@ resource "aws_launch_configuration" "ecs" {
   instance_type               = "${var.instance_types["aws_launch_configuration"]}"
   iam_instance_profile        = "${aws_iam_instance_profile.ecs.name}"
   security_groups             = ["${aws_security_group.ecs_instance.id}"]
-  associate_public_ip_address = true
+  associate_public_ip_address = false
 
   user_data = <<EOF
 #!/bin/bash
