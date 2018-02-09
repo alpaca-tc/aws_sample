@@ -52,6 +52,22 @@ resource "aws_route_table_association" "public" {
   route_table_id = "${aws_route_table.public.id}"
 }
 
+# 踏み台サーバー
+resource "aws_eip" "bastion" {
+  vpc = true
+
+  tags {
+    Name    = "${var.application_name}-bastion-${terraform.env}"
+    Env     = "${terraform.env}"
+    AppName = "${var.application_name}"
+  }
+}
+
+resource "aws_eip_association" "bastion" {
+  instance_id   = "${aws_instance.bastion.id}"
+  allocation_id = "${aws_eip.bastion.id}"
+}
+
 # NATを配置する
 # https://docs.aws.amazon.com/ja_jp/AmazonVPC/latest/UserGuide/vpc-nat-gateway.html
 resource "aws_subnet" "nat-gateway" {
@@ -71,6 +87,12 @@ resource "aws_subnet" "nat-gateway" {
 resource "aws_eip" "nat-gateway" {
   count = "${length(data.aws_availability_zones.available.names)}"
   vpc   = true
+
+  tags {
+    Name    = "${var.application_name}-nat-gateway-${count.index}-${terraform.env}"
+    Env     = "${terraform.env}"
+    AppName = "${var.application_name}"
+  }
 }
 
 resource "aws_nat_gateway" "nat-gateway" {
@@ -79,6 +101,12 @@ resource "aws_nat_gateway" "nat-gateway" {
   subnet_id     = "${element(aws_subnet.nat-gateway.*.id, count.index)}"
 
   depends_on = ["aws_internet_gateway.gateway"]
+
+  tags {
+    Name    = "${var.application_name}-nat-gateway-${count.index}-${terraform.env}"
+    Env     = "${terraform.env}"
+    AppName = "${var.application_name}"
+  }
 }
 
 resource "aws_route_table" "nat-gateway" {
