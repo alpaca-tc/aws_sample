@@ -2,7 +2,7 @@
 resource "aws_alb" "main" {
   name            = "main"
   subnets         = ["${aws_subnet.public.*.id}"]
-  security_groups = ["${aws_security_group.lb_sg.id}"]
+  security_groups = ["${aws_security_group.alb.id}"]
 }
 
 resource "aws_alb_target_group" "rails" {
@@ -18,7 +18,7 @@ resource "aws_alb_target_group" "rails" {
   }
 }
 
-resource "aws_alb_listener" "front_end" {
+resource "aws_alb_listener" "rails" {
   load_balancer_arn = "${aws_alb.main.id}"
   port              = "3000"
   protocol          = "HTTP"

@@ -1,6 +1,6 @@
 resource "aws_launch_configuration" "ecs" {
   security_groups = [
-    "${aws_security_group.instance_sg.id}",
+    "${aws_security_group.ecs_instance.id}",
   ]
 
   key_name                    = "${aws_key_pair.application.key_name}"
@@ -20,11 +20,11 @@ EOF
   }
 }
 
-resource "aws_security_group" "lb_sg" {
-  description = "controls access to the application ELB"
+resource "aws_security_group" "alb" {
+  description = "Controls access to the application ELB"
 
   vpc_id = "${aws_vpc.main.id}"
-  name   = "tf-ecs-lbsg"
+  name   = "alb"
 
   ingress {
     protocol    = "tcp"
@@ -44,10 +44,10 @@ resource "aws_security_group" "lb_sg" {
   }
 }
 
-resource "aws_security_group" "instance_sg" {
-  description = "controls direct access to application instances"
+resource "aws_security_group" "ecs_instance" {
+  description = "Controls direct access to ecs instances"
   vpc_id      = "${aws_vpc.main.id}"
-  name        = "tf-ecs-instsg"
+  name        = "ecs_instance"
 
   ingress {
     protocol  = "tcp"
@@ -65,7 +65,7 @@ resource "aws_security_group" "instance_sg" {
     to_port   = 3000
 
     security_groups = [
-      "${aws_security_group.lb_sg.id}",
+      "${aws_security_group.alb.id}",
     ]
   }
 
@@ -98,7 +98,7 @@ resource "aws_ecs_service" "rails" {
   }
 
   depends_on = [
-    "aws_alb_listener.front_end",
+    "aws_alb_listener.rails",
   ]
 }
 
