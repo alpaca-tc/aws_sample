@@ -7,6 +7,7 @@ resource "aws_launch_configuration" "ecs" {
   image_id                    = "ami-872c4ae1"
   instance_type               = "${var.instance_types["aws_launch_configuration"]}"
   iam_instance_profile        = "${aws_iam_instance_profile.ecs.name}"
+  security_groups             = ["${aws_security_group.ecs_instance.id}"]
   associate_public_ip_address = true
 
   user_data = <<EOF
@@ -17,63 +18,6 @@ EOF
 
   lifecycle {
     create_before_destroy = true
-  }
-}
-
-resource "aws_security_group" "alb" {
-  description = "Controls access to the application ELB"
-
-  vpc_id = "${aws_vpc.main.id}"
-  name   = "alb"
-
-  ingress {
-    protocol    = "tcp"
-    from_port   = 3000
-    to_port     = 3000
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
-
-    cidr_blocks = [
-      "0.0.0.0/0",
-    ]
-  }
-}
-
-resource "aws_security_group" "ecs_instance" {
-  description = "Controls direct access to ecs instances"
-  vpc_id      = "${aws_vpc.main.id}"
-  name        = "ecs_instance"
-
-  ingress {
-    protocol  = "tcp"
-    from_port = 22
-    to_port   = 22
-
-    cidr_blocks = [
-      "${var.admin_cidr_ingress}",
-    ]
-  }
-
-  ingress {
-    protocol  = "tcp"
-    from_port = 3000
-    to_port   = 3000
-
-    security_groups = [
-      "${aws_security_group.alb.id}",
-    ]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
