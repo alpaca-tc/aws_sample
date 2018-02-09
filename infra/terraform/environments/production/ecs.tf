@@ -1,13 +1,13 @@
 resource "aws_launch_configuration" "ecs" {
   security_groups = [
-    "${aws_security_group.ecs_instance.id}",
+    "${aws_security_group.ecs-instance.id}",
   ]
 
-  key_name                    = "${aws_key_pair.application.key_name}"
+  key_name                    = "${aws_key_pair.bastion.key_name}"
   image_id                    = "ami-872c4ae1"
   instance_type               = "${var.instance_types["aws_launch_configuration"]}"
   iam_instance_profile        = "${aws_iam_instance_profile.ecs.name}"
-  security_groups             = ["${aws_security_group.ecs_instance.id}"]
+  security_groups             = ["${aws_security_group.ecs-instance.id}"]
   associate_public_ip_address = false
 
   user_data = <<EOF
@@ -68,6 +68,6 @@ resource "aws_autoscaling_group" "main" {
   vpc_zone_identifier  = ["${aws_subnet.public.*.id}"]
   min_size             = 1
   max_size             = 2
-  desired_capacity     = 2
+  desired_capacity     = 1
   launch_configuration = "${aws_launch_configuration.ecs.name}"
 }

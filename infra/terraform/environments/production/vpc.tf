@@ -104,6 +104,7 @@ resource "aws_route_table_association" "nat-gateway" {
 }
 
 # ECSとNATをつなぐ
+# https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/launch_container_instance.html
 resource "aws_route_table_association" "private-nat" {
   count          = "${length(data.aws_availability_zones.available.names)}"
   subnet_id      = "${element(aws_subnet.private-nat.*.id, count.index)}"
