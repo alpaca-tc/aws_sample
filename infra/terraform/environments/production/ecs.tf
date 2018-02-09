@@ -6,7 +6,7 @@ resource "aws_launch_configuration" "ecs" {
 
   security_groups = [
     "${aws_security_group.ecs-instance.id}",
-    "${aws_security_group.nat-gateway.id}",
+    "${aws_security_group.to-nat-gateway.id}",
   ]
 
   associate_public_ip_address = false
@@ -56,7 +56,7 @@ data "template_file" "task_definition" {
   template = "${file("${path.module}/task-definition.json")}"
 
   vars {
-    image_url        = "016559158979.dkr.ecr.ap-northeast-1.amazonaws.com/sample:latest"
+    image_url        = "${var.image_urls["rack_application"]}"
     container_name   = "sample"
     log_group_region = "${var.region}"
     log_group_name   = "${aws_cloudwatch_log_group.app.name}"
@@ -66,7 +66,7 @@ data "template_file" "task_definition" {
 # Autoscaling
 resource "aws_autoscaling_group" "main" {
   name                 = "main"
-  vpc_zone_identifier  = ["${aws_subnet.public.*.id}"]
+  vpc_zone_identifier  = ["${aws_subnet.private-nat.*.id}"]
   min_size             = 1
   max_size             = 1
   desired_capacity     = 1

@@ -54,24 +54,21 @@ resource "aws_security_group" "ecs-instance" {
     protocol    = "tcp"
     from_port   = 80
     to_port     = 80
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    protocol  = "tcp"
-    from_port = 3000
-    to_port   = 3000
 
     security_groups = [
       "${aws_security_group.alb.id}",
     ]
   }
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+  ingress {
+    description = "HTTP"
+    protocol    = "tcp"
+    from_port   = 3000
+    to_port     = 3000
+
+    security_groups = [
+      "${aws_security_group.alb.id}",
+    ]
   }
 
   tags = {
@@ -119,32 +116,10 @@ resource "aws_security_group" "bastion" {
 ##
 # NAT Gateway
 ##
-resource "aws_security_group" "nat-gateway" {
-  name        = "${var.application_name}-nat-gateway-${terraform.env}"
-  description = "NAT Gateway"
+resource "aws_security_group" "to-nat-gateway" {
+  name        = "${var.application_name}-to-nat-gateway-${terraform.env}"
+  description = "To NAT Gateway"
   vpc_id      = "${aws_vpc.main.id}"
-
-  ingress {
-    description = "HTTP"
-    protocol    = "tcp"
-    from_port   = 80
-    to_port     = 80
-
-    security_groups = [
-      "${aws_security_group.ecs-instance.id}",
-    ]
-  }
-
-  ingress {
-    description = "HTTP"
-    protocol    = "tcp"
-    from_port   = 443
-    to_port     = 443
-
-    security_groups = [
-      "${aws_security_group.ecs-instance.id}",
-    ]
-  }
 
   egress {
     description = "HTTP"
@@ -179,7 +154,7 @@ resource "aws_security_group" "nat-gateway" {
   }
 
   tags = {
-    Name    = "${var.application_name}-nat-gateway-${terraform.env}"
+    Name    = "${var.application_name}-to-nat-gateway-${terraform.env}"
     Role    = "ecs"
     Env     = "${terraform.env}"
     AppName = "${var.application_name}"

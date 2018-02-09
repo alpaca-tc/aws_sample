@@ -52,7 +52,7 @@ resource "aws_route_table_association" "public" {
   route_table_id = "${element(aws_route_table.public.*.id, count.index)}"
 }
 
-# 踏み台サーバー
+# 踏み台サーバーを配置する
 resource "aws_eip" "bastion" {
   vpc = true
 
@@ -70,20 +70,6 @@ resource "aws_eip_association" "bastion" {
 
 # NATを配置する
 # https://docs.aws.amazon.com/ja_jp/AmazonVPC/latest/UserGuide/vpc-nat-gateway.html
-resource "aws_subnet" "nat-gateway" {
-  count                   = "${length(data.aws_availability_zones.available.names)}"
-  vpc_id                  = "${aws_vpc.main.id}"
-  cidr_block              = "${cidrsubnet(aws_vpc.main.cidr_block, 8, 10 + count.index)}"
-  map_public_ip_on_launch = false
-  availability_zone       = "${data.aws_availability_zones.available.names[count.index]}"
-
-  tags {
-    Name    = "${var.application_name}-nat-gateway-${count.index}-${terraform.env}"
-    Env     = "${terraform.env}"
-    AppName = "${var.application_name}"
-  }
-}
-
 resource "aws_eip" "nat-gateway" {
   count = "${length(data.aws_availability_zones.available.names)}"
   vpc   = true
@@ -98,45 +84,14 @@ resource "aws_eip" "nat-gateway" {
 resource "aws_nat_gateway" "nat-gateway" {
   count         = "${length(data.aws_availability_zones.available.names)}"
   allocation_id = "${element(aws_eip.nat-gateway.*.id, count.index)}"
-  subnet_id     = "${element(aws_subnet.nat-gateway.*.id, count.index)}"
-
-  depends_on = ["aws_internet_gateway.gateway"]
+  subnet_id     = "${element(aws_subnet.public.*.id, count.index)}"
+  depends_on    = ["aws_internet_gateway.gateway"]
 
   tags {
     Name    = "${var.application_name}-nat-gateway-${count.index}-${terraform.env}"
     Env     = "${terraform.env}"
     AppName = "${var.application_name}"
   }
-}
-
-resource "aws_route_table" "nat-gateway" {
-  count  = "${length(data.aws_availability_zones.available.names)}"
-  vpc_id = "${aws_vpc.main.id}"
-
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = "${element(aws_nat_gateway.nat-gateway.*.id, count.index)}"
-  }
-
-  tags {
-    Name    = "${var.application_name}-nat-gateway-${terraform.env}-${count.index}"
-    Env     = "${terraform.env}"
-    AppName = "${var.application_name}"
-  }
-}
-
-resource "aws_route_table_association" "nat-gateway" {
-  count          = "${length(data.aws_availability_zones.available.names)}"
-  subnet_id      = "${element(aws_subnet.nat-gateway.*.id, count.index)}"
-  route_table_id = "${element(aws_route_table.public.*.id, count.index)}"
-}
-
-# ECSとNATをつなぐ
-# https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/launch_container_instance.html
-resource "aws_route_table_association" "private-nat" {
-  count          = "${length(data.aws_availability_zones.available.names)}"
-  subnet_id      = "${element(aws_subnet.private-nat.*.id, count.index)}"
-  route_table_id = "${element(aws_route_table.nat-gateway.*.id, count.index)}"
 }
 
 ##
@@ -157,6 +112,30 @@ resource "aws_subnet" "private-nat" {
     Env     = "${terraform.env}"
     AppName = "${var.application_name}"
   }
+}
+
+resource "aws_route_table" "private-nat" {
+  count  = "${length(data.aws_availability_zones.available.names)}"
+  vpc_id = "${aws_vpc.main.id}"
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = "${element(aws_nat_gateway.nat-gateway.*.id, count.index)}"
+  }
+
+  tags {
+    Name    = "${var.application_name}-private-nat-${terraform.env}-${count.index}"
+    Env     = "${terraform.env}"
+    AppName = "${var.application_name}"
+  }
+}
+
+# ECSとNATをつなぐ
+# https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/launch_container_instance.html
+resource "aws_route_table_association" "private-nat" {
+  count          = "${length(data.aws_availability_zones.available.names)}"
+  subnet_id      = "${element(aws_subnet.private-nat.*.id, count.index)}"
+  route_table_id = "${element(aws_route_table.private-nat.*.id, count.index)}"
 }
 
 ##
