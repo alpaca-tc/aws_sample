@@ -26,7 +26,7 @@ EOF
 # ECS
 ##
 resource "aws_ecs_cluster" "main" {
-  name = "terraform_example_ecs_cluster"
+  name = "rails-application"
 }
 
 resource "aws_ecs_service" "rails" {
@@ -48,7 +48,7 @@ resource "aws_ecs_service" "rails" {
 }
 
 resource "aws_ecs_task_definition" "sample" {
-  family                = "sample_ecs_task_definition"
+  family                = "rails-application"
   container_definitions = "${data.template_file.task_definition.rendered}"
 }
 
