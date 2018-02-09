@@ -5,6 +5,13 @@ resource "aws_security_group" "alb" {
 
   ingress {
     protocol    = "tcp"
+    from_port   = 80
+    to_port     = 80
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    protocol    = "tcp"
     from_port   = 3000
     to_port     = 3000
     cidr_blocks = ["0.0.0.0/0"]
@@ -43,6 +50,14 @@ resource "aws_security_group" "ecs-instance" {
   }
 
   ingress {
+    description = "HTTP"
+    protocol    = "tcp"
+    from_port   = 80
+    to_port     = 80
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     protocol  = "tcp"
     from_port = 3000
     to_port   = 3000
@@ -62,6 +77,7 @@ resource "aws_security_group" "ecs-instance" {
   tags = {
     Name    = "${var.application_name}-ecs-instance-${terraform.env}"
     Env     = "${terraform.env}"
+    Role    = "ecs"
     AppName = "${var.application_name}"
   }
 }
@@ -95,6 +111,76 @@ resource "aws_security_group" "bastion" {
   tags = {
     Name    = "${var.application_name}-bastion-${terraform.env}"
     Role    = "bastion"
+    Env     = "${terraform.env}"
+    AppName = "${var.application_name}"
+  }
+}
+
+##
+# NAT Gateway
+##
+resource "aws_security_group" "nat-gateway" {
+  name        = "${var.application_name}-nat-gateway-${terraform.env}"
+  description = "NAT Gateway"
+  vpc_id      = "${aws_vpc.main.id}"
+
+  ingress {
+    description = "HTTP"
+    protocol    = "tcp"
+    from_port   = 80
+    to_port     = 80
+
+    security_groups = [
+      "${aws_security_group.ecs-instance.id}",
+    ]
+  }
+
+  ingress {
+    description = "HTTP"
+    protocol    = "tcp"
+    from_port   = 443
+    to_port     = 443
+
+    security_groups = [
+      "${aws_security_group.ecs-instance.id}",
+    ]
+  }
+
+  egress {
+    description = "HTTP"
+    protocol    = "tcp"
+    from_port   = 80
+    to_port     = 80
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "NTP"
+    protocol    = "udp"
+    from_port   = 123
+    to_port     = 123
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "HTTPS"
+    protocol    = "tcp"
+    from_port   = 443
+    to_port     = 443
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "SMTP"
+    protocol    = "tcp"
+    from_port   = 587
+    to_port     = 587
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name    = "${var.application_name}-nat-gateway-${terraform.env}"
+    Role    = "ecs"
     Env     = "${terraform.env}"
     AppName = "${var.application_name}"
   }

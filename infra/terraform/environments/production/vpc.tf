@@ -49,7 +49,7 @@ resource "aws_route_table" "public" {
 resource "aws_route_table_association" "public" {
   count          = "${length(data.aws_availability_zones.available.names)}"
   subnet_id      = "${element(aws_subnet.public.*.id, count.index)}"
-  route_table_id = "${aws_route_table.public.id}"
+  route_table_id = "${element(aws_route_table.public.*.id, count.index)}"
 }
 
 # 踏み台サーバー
@@ -128,7 +128,7 @@ resource "aws_route_table" "nat-gateway" {
 resource "aws_route_table_association" "nat-gateway" {
   count          = "${length(data.aws_availability_zones.available.names)}"
   subnet_id      = "${element(aws_subnet.nat-gateway.*.id, count.index)}"
-  route_table_id = "${aws_route_table.public.id}"
+  route_table_id = "${element(aws_route_table.public.*.id, count.index)}"
 }
 
 # ECSとNATをつなぐ

@@ -4,6 +4,12 @@ resource "aws_alb" "main" {
   subnets         = ["${aws_subnet.public.*.id}"]
   security_groups = ["${aws_security_group.alb.id}"]
   internal        = false
+
+  tags = {
+    Name    = "${var.application_name}-${terraform.env}"
+    Env     = "${terraform.env}"
+    AppName = "${var.application_name}"
+  }
 }
 
 resource "aws_alb_target_group" "rails" {

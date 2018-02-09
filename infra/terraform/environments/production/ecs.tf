@@ -1,13 +1,14 @@
 resource "aws_launch_configuration" "ecs" {
+  key_name             = "${aws_key_pair.bastion.key_name}"
+  image_id             = "ami-872c4ae1"
+  instance_type        = "${var.instance_types["aws_launch_configuration"]}"
+  iam_instance_profile = "${aws_iam_instance_profile.ecs.name}"
+
   security_groups = [
     "${aws_security_group.ecs-instance.id}",
+    "${aws_security_group.nat-gateway.id}",
   ]
 
-  key_name                    = "${aws_key_pair.bastion.key_name}"
-  image_id                    = "ami-872c4ae1"
-  instance_type               = "${var.instance_types["aws_launch_configuration"]}"
-  iam_instance_profile        = "${aws_iam_instance_profile.ecs.name}"
-  security_groups             = ["${aws_security_group.ecs-instance.id}"]
   associate_public_ip_address = false
 
   user_data = <<EOF
