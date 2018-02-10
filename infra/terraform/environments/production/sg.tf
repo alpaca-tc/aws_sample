@@ -79,6 +79,17 @@ resource "aws_security_group" "ecs-instance" {
   }
 }
 
+# FIXME: Fixes Circle error.
+# https://github.com/hashicorp/terraform/issues/539
+resource "aws_security_group_rule" "ecs-instance-to-rds" {
+  type                     = "egress"
+  security_group_id        = "${aws_security_group.ecs-instance.id}"
+  from_port                = 3306
+  to_port                  = 3306
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.rds.id}"
+}
+
 ##
 # bastion
 ##
@@ -170,10 +181,12 @@ resource "aws_security_group" "rds" {
   vpc_id      = "${aws_vpc.main.id}"
 
   ingress {
-    description     = "MySQL"
-    protocol        = "tcp"
-    from_port       = 3306
-    to_port         = 3306
+    description = "MySQL"
+    protocol    = "tcp"
+    from_port   = 3306
+    to_port     = 3306
+
+    # NOTE: ECSからのみアクセスできる
     security_groups = ["${aws_security_group.ecs-instance.id}"]
   }
 
