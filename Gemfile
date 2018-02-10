@@ -9,6 +9,7 @@ gem 'rails'
 gem 'mysql2'
 gem 'redis'
 gem 'puma'
+gem 'webpacker'
 
 group :development, :test do
   gem 'pry'
