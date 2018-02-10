@@ -25,6 +25,6 @@ USER app:app
 COPY --chown=app:app . $APP_DIR
 
 RUN echo 'gem: --no-document' > ~/.gemrc
-RUN /app/bin/setup
+RUN bundle install --path .bundle
 
 CMD /app/bin/rails server --port 3000 --binding 0.0.0.0
