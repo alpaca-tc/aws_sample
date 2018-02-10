@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+
+# S3にファイルをアップロードするスクリプト
+# 最終的にはbuild pipelineあたりに組み込まれる
+
+ENV['BUNDLE_GEMFILE'] ||= File.expand_path('../../Gemfile', __dir__)
+
+require 'bundler/setup'
+require 'aws-sdk-s3'
+
+def system!(*args)
+  system(*args) || abort("\n== Command #{args} failed ==")
+end
+
+def build_s3_bucket(profile:, region:, bucket_name:)
+  client = Aws::S3::Client.new(profile: profile, region: region)
+  s3 = Aws::S3::Resource.new(client: client)
+  s3.bucket(bucket_name)
+end
+
+APP_ROOT = File.expand_path('../../../', __FILE__)
+
+Dir.chdir(APP_ROOT) do
+  system({ 'RAILS_ENV' => 'production' }, './bin/webpack')
+
+  bucket = build_s3_bucket(profile: 'sample-production', region: 'ap-northeast-1', bucket_name: 'sample-public-assets')
+
+  manifest_json = File.join(APP_ROOT, 'public', 'packs', 'manifest.json')
+  manifest = JSON.parse(File.read(manifest_json))
+
+  pack_paths = manifest.values.map { |path| path.gsub(/^\//, '') }
+
+  pack_paths.each do |path|
+    real_path = File.join(APP_ROOT, 'public', path)
+
+    object = bucket.object(path)
+    object.upload_file(real_path)
+  end
+end
