@@ -160,3 +160,35 @@ resource "aws_security_group" "to-nat-gateway" {
     AppName = "${var.application_name}"
   }
 }
+
+##
+# RDS
+##
+resource "aws_security_group" "rds" {
+  name        = "${var.application_name}-rds-${terraform.env}"
+  description = "RDS"
+  vpc_id      = "${aws_vpc.main.id}"
+
+  ingress {
+    description     = "MySQL"
+    protocol        = "tcp"
+    from_port       = 3306
+    to_port         = 3306
+    security_groups = ["${aws_security_group.ecs-instance.id}"]
+  }
+
+  egress {
+    description = "NTP"
+    protocol    = "udp"
+    from_port   = 123
+    to_port     = 123
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name    = "${var.application_name}-rds-${terraform.env}"
+    Role    = "rds"
+    Env     = "${terraform.env}"
+    AppName = "${var.application_name}"
+  }
+}
