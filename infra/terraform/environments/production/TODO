@@ -1,0 +1,13 @@
+- [x] Route53
+- [ ] KMS
+- [ ] CloudFront
+- [ ] S3
+- [ ] Code Deploy
+- [ ] ECS - sidekiq
+- [ ] ECS - nginx
+- [ ] CloudWatch
+- [ ] SNS
+- [ ] IAM
+- [ ] Code Deploy
+- [ ] Athena <- いる？
+- [ ] SES / SendGrid <- いる？
