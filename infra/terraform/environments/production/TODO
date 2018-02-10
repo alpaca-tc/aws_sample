@@ -1,5 +1,5 @@
 - [x] Route53
-- [ ] KMS
+- [x] KMS
 - [ ] CloudFront
 - [ ] S3
 - [ ] Code Deploy
@@ -9,5 +9,5 @@
 - [ ] SNS
 - [ ] IAM
 - [ ] Code Deploy
-- [ ] Athena <- いる？
+- [ ] Athena / Elasticsearch <- いる？
 - [ ] SES / SendGrid <- いる？

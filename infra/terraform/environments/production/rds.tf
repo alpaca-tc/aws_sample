@@ -42,20 +42,18 @@ resource "aws_rds_cluster" "main" {
     "${aws_security_group.rds.id}",
   ]
 
-  # TODO: KMSに置き換える
   master_username         = "root"
-  master_password         = "password"
-  backup_retention_period = 7          # days
+  master_password         = "${data.aws_kms_secret.rds.master_password}"
+  backup_retention_period = 7                                            # days
 
-  # TODO: KMSで暗号化する
-  # storage_encrypted       = true
-  # kms_key_id              = "${aws_kms_key.rds.arn}"
+  storage_encrypted = true
+  kms_key_id        = "${aws_kms_key.rds-encryption.arn}"
 
-  # final_snapshot_identifier = "${var.application_name}-${terraform.env}"
-  # skip_final_snapshot       = false
+  final_snapshot_identifier = "${var.application_name}-${terraform.env}"
+  skip_final_snapshot       = false
 
-  # preferred_backup_window      = "01:00-02:00"
-  # preferred_maintenance_window = "Mon:02:30-Mon:04:30"
+  preferred_backup_window      = "01:00-02:00"
+  preferred_maintenance_window = "Mon:02:30-Mon:04:30"
 }
 
 resource "aws_db_parameter_group" "main" {
