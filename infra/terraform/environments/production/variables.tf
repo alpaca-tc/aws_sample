@@ -19,6 +19,15 @@ variable "instance_types" {
     "rds"                      = "db.t2.small"
     "aws_launch_configuration" = "t2.micro"
     "ec2_bastion"              = "t2.micro"
+    "elasticache_sidekiq"      = "cache.t2.micro"
+  }
+}
+
+variable "sidekiq" {
+  type = "map"
+
+  default = {
+    "number_cache_clusters" = 2
   }
 }
 

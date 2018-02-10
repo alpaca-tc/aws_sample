@@ -205,3 +205,37 @@ resource "aws_security_group" "rds" {
     AppName = "${var.application_name}"
   }
 }
+
+##
+# ElastiCache - Redis
+##
+resource "aws_security_group" "elasticache" {
+  name        = "${var.application_name}-elasticache-${terraform.env}"
+  description = "ElastiCache"
+  vpc_id      = "${aws_vpc.main.id}"
+
+  ingress {
+    description = "Redis"
+    protocol    = "tcp"
+    from_port   = 6379
+    to_port     = 6379
+
+    # NOTE: ECSからのみアクセスできる
+    security_groups = ["${aws_security_group.ecs-instance.id}"]
+  }
+
+  egress {
+    description = "NTP"
+    protocol    = "udp"
+    from_port   = 123
+    to_port     = 123
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name    = "${var.application_name}-elasticache-${terraform.env}"
+    Role    = "elasticache"
+    Env     = "${terraform.env}"
+    AppName = "${var.application_name}"
+  }
+}
