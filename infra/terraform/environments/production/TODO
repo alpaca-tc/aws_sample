@@ -9,8 +9,8 @@
 - [x] KMS
 - [ ] ECS - nginx
 - [ ] ECS - sidekiq
-- [ ] CloudFront
-- [ ] S3
+- [x] CloudFront
+- [x] S3
 - [ ] SNS
 - [ ] IAM発展
 - [ ] Code Deploy

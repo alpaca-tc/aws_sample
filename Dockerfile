@@ -13,6 +13,7 @@ RUN adduser -S -g app app
 RUN mkdir -p $APP_DIR $BIN_DIR
 RUN chown app:app $APP_DIR $BIN_DIR
 
+EXPOSE 3000
 WORKDIR $APP_DIR
 
 RUN apk --update --no-cache add mysql-dev nodejs tzdata openssl bash build-base
