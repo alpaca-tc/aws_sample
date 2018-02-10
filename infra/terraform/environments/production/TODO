@@ -1,13 +1,20 @@
+- [x] IAM
+- [x] VPC
+- [x] Security Group
+- [x] EC2
+- [x] ECS
+- [x] RDS
+- [x] Elasticache
 - [x] Route53
 - [x] KMS
+- [ ] ECS - nginx
+- [ ] ECS - sidekiq
 - [ ] CloudFront
 - [ ] S3
-- [ ] Code Deploy
-- [ ] ECS - sidekiq
-- [ ] ECS - nginx
-- [ ] CloudWatch
 - [ ] SNS
-- [ ] IAM
+- [ ] IAM発展
 - [ ] Code Deploy
+- [ ] Code Pipeline
+- [ ] CloudWatch
 - [ ] Athena / Elasticsearch <- いる？
 - [ ] SES / SendGrid <- いる？
