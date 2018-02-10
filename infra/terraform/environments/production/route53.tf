@@ -34,8 +34,8 @@ resource "aws_route53_record" "terraform-example-net-assets" {
   type    = "A"
 
   alias {
-    name                   = "${aws_alb.main.dns_name}"
-    zone_id                = "${aws_alb.main.zone_id}"
+    name                   = "${aws_cloudfront_distribution.public-assets.domain_name}"
+    zone_id                = "${aws_cloudfront_distribution.public-assets.hosted_zone_id}"
     evaluate_target_health = false
   }
 }
