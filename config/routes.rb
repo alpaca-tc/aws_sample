@@ -3,4 +3,5 @@ Rails.application.routes.draw do
 
   resource :google
   resource :database
+  resource :redis
 end
