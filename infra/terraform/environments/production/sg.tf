@@ -82,12 +82,25 @@ resource "aws_security_group" "ecs-instance" {
 # FIXME: Fixes Circle error.
 # https://github.com/hashicorp/terraform/issues/539
 resource "aws_security_group_rule" "ecs-instance-to-rds" {
+  description              = "RDS"
   type                     = "egress"
   security_group_id        = "${aws_security_group.ecs-instance.id}"
   from_port                = 3306
   to_port                  = 3306
   protocol                 = "tcp"
   source_security_group_id = "${aws_security_group.rds.id}"
+}
+
+# FIXME: Fixes Circle error.
+# https://github.com/hashicorp/terraform/issues/539
+resource "aws_security_group_rule" "ecs-instance-to-elasticache" {
+  description              = "ElastiCache"
+  type                     = "egress"
+  security_group_id        = "${aws_security_group.ecs-instance.id}"
+  from_port                = 6379
+  to_port                  = 6379
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.elasticache.id}"
 }
 
 ##
