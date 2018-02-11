@@ -28,6 +28,18 @@ resource "aws_route53_record" "terraform-example-net" {
   }
 }
 
+resource "aws_route53_record" "terraform-example-net-cname" {
+  zone_id = "${aws_route53_zone.terraform-example-net.zone_id}"
+  name    = "www.terraform-example.net."
+  type    = "CNAME"
+
+  alias {
+    name                   = "${aws_alb.main.dns_name}"
+    zone_id                = "${aws_alb.main.zone_id}"
+    evaluate_target_health = false
+  }
+}
+
 resource "aws_route53_record" "terraform-example-net-assets" {
   zone_id = "${aws_route53_zone.terraform-example-net.zone_id}"
   name    = "assets.terraform-example.net."
