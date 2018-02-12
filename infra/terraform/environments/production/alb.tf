@@ -1,4 +1,3 @@
-## ALB
 resource "aws_alb" "main" {
   name            = "main"
   subnets         = ["${aws_subnet.public.*.id}"]
