@@ -33,5 +33,8 @@ data "template_file" "task_definition" {
     container_name   = "sample"
     log_group_region = "${var.region}"
     log_group_name   = "${aws_cloudwatch_log_group.app.name}"
+
+    # config/credentials.yml.enc を復号する
+    rails_master_key = "${replace(data.aws_kms_secret.rails-credentials.master-key, "\n", "")}"
   }
 }

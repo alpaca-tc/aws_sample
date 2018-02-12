@@ -43,8 +43,8 @@ resource "aws_rds_cluster" "main" {
   ]
 
   master_username         = "root"
-  master_password         = "${data.aws_kms_secret.rds.master_password}"
-  backup_retention_period = 7                                            # days
+  master_password         = "${replace(data.aws_kms_secret.rds.master_password, "\n", "")}"
+  backup_retention_period = 7                                                               # days
 
   storage_encrypted = true
   kms_key_id        = "${aws_kms_key.rds-encryption.arn}"

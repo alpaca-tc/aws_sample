@@ -60,7 +60,7 @@ data "aws_kms_secret" "rds" {
     # echo 'password' > password
     # `aws kms encrypt --key-id ${aws_kms_key.rds-encryption.id} --plaintext fileb://password --output text --query CiphertextBlob`
     # `aws kms encrypt --key-id ef6c5bbb-987a-xxxx-xxxx-xxxxxxxxxxxx --plaintext fileb://password --output text --query CiphertextBlob`
-    payload = "AQICAHhPztxviy1PZ060YJ8T8AY47r2vj3hmVDJXq4QmB6EEywHvlQ8ogDc3HHrFE9r83EHDAAAAdzB1BgkqhkiG9w0BBwagaDBmAgEAMGEGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMAZCZ9Fq9ZxiMdm4HAgEQgDQdb8ZWU14MKk3180ljE07FarlkJ6AHgQ9Mj/e8LaIR1GBMSoUVlEIuuI9suPsFZ8ZUEYKR"
+    payload = "AQICAHjy8oSqUi4nvrsdWSAwclVA0qPOubYLr3rTM9ECoixFWQGQClxG+iC5iHtcnvzev2C3AAAAdzB1BgkqhkiG9w0BBwagaDBmAgEAMGEGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMhTTESCz7SVeuAikTAgEQgDSdNXfkRepRpY350CBS+dtzlHXYS8S2JnuqspCDcm7YVAxT/UI3b/whyKucxU5CLQHQdnfL"
   }
 }
 
@@ -72,5 +72,17 @@ variable "sidekiq" {
 
   default = {
     "number_cache_clusters" = 2
+  }
+}
+
+##
+# Rails credentials
+##
+data "aws_kms_secret" "rails-credentials" {
+  secret {
+    name = "master-key"
+
+    # `aws kms encrypt --key-id ${aws_kms_key.rails-credentials.id} --plaintext fileb://password --output text --query CiphertextBlob`
+    payload = "AQICAHgApMIEjfJ00SWte9wdMAFPGo5BpEPNg4spWX7ve36SBAFY0ypfeCu+cY7RS1Zf/+jQAAAAfzB9BgkqhkiG9w0BBwagcDBuAgEAMGkGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMqdhyGLdKqj5e/mvjAgEQgDxAKfyKSRih1qLcIyzTQudlNK1s/7JF55AuVKrSLuZrw2TPBkgR37plS+eFSrnCf4kxnYGIyY5vS1O89ms="
   }
 }

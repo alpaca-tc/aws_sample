@@ -18,3 +18,8 @@
 - [ ] CloudWatch
 - [ ] Athena / Elasticsearch <- いる？
 - [ ] SES / SendGrid <- いる？
+
+- KMSを使ってRDSのパスワードを復号してRailsを起動する
+- ローカルで起動する
+- サーバーにあげる
+- sshで入って、手動で起動する？

@@ -1,22 +1,32 @@
 [
   {
-    "cpu": 1,
+    "cpu": 300,
     "essential": true,
     "image": "${image_url}",
     "memory": 300,
     "name": "${container_name}",
+    "environment": [
+      {
+        "name": "RAILS_ENV",
+        "value": "production"
+      }, {
+        "name": "RAILS_MASTER_KEY",
+        "value": "${rails_master_key}"
+      }
+    ],
     "portMappings": [
       {
-        "containerPort": 3000,
-        "hostPort": 0
+        "protocol": "tcp",
+        "hostPort": 0,
+        "containerPort": 3000
       }
     ],
     "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-            "awslogs-group": "${log_group_name}",
-            "awslogs-region": "${log_group_region}"
-        }
+      "logDriver": "awslogs",
+      "options": {
+          "awslogs-group": "${log_group_name}",
+          "awslogs-region": "${log_group_region}"
+      }
     }
   }
 ]
