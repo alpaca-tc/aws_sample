@@ -30,4 +30,4 @@ RUN cd $APP_DIR && bundle install --path .bundle --jobs 5
 
 COPY --chown=app:app . $APP_DIR
 
-CMD $APP_DIR/bin/rails server --port 3000 --binding 0.0.0.0
+CMD ["/app/bin/rails", "server", "--port", "80", "--binding", "0.0.0.0"]

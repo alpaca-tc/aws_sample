@@ -4,6 +4,7 @@ resource "aws_security_group" "alb" {
   vpc_id      = "${aws_vpc.main.id}"
 
   ingress {
+    description = "HTTP"
     protocol    = "tcp"
     from_port   = 80
     to_port     = 80
@@ -11,6 +12,15 @@ resource "aws_security_group" "alb" {
   }
 
   ingress {
+    description = "HTTPS"
+    protocol    = "tcp"
+    from_port   = 443
+    to_port     = 443
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "HTTP"
     protocol    = "tcp"
     from_port   = 3000
     to_port     = 3000
@@ -18,9 +28,10 @@ resource "aws_security_group" "alb" {
   }
 
   egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    description = "Allow ALL"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
 
     cidr_blocks = [
       "0.0.0.0/0",
@@ -49,22 +60,12 @@ resource "aws_security_group" "ecs-instance" {
     ]
   }
 
+  # ECSはDockerを通じてhost portを動的に定義するため
+  # Dockerが使いうるportを解放する
   ingress {
-    description = "HTTP"
-    protocol    = "tcp"
-    from_port   = 80
-    to_port     = 80
-
-    security_groups = [
-      "${aws_security_group.alb.id}",
-    ]
-  }
-
-  ingress {
-    description = "HTTP"
-    protocol    = "tcp"
-    from_port   = 3000
-    to_port     = 3000
+    protocol  = "tcp"
+    from_port = 1000
+    to_port   = 65535
 
     security_groups = [
       "${aws_security_group.alb.id}",
@@ -112,9 +113,10 @@ resource "aws_security_group" "bastion" {
   vpc_id      = "${aws_vpc.main.id}"
 
   ingress {
-    protocol  = "tcp"
-    from_port = 22
-    to_port   = 22
+    description = "SSH"
+    protocol    = "tcp"
+    from_port   = 22
+    to_port     = 22
 
     cidr_blocks = [
       "${var.admin_cidr_ingress}",
@@ -122,9 +124,10 @@ resource "aws_security_group" "bastion" {
   }
 
   egress {
-    protocol  = "tcp"
-    from_port = 22
-    to_port   = 22
+    description = "SSH"
+    protocol    = "tcp"
+    from_port   = 22
+    to_port     = 22
 
     cidr_blocks = ["${aws_vpc.main.cidr_block}"]
   }

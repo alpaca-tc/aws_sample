@@ -3,11 +3,9 @@ resource "aws_autoscaling_group" "main" {
   availability_zones   = ["${data.aws_availability_zones.available.names}"]
   vpc_zone_identifier  = ["${aws_subnet.private-nat.*.id}"]
   min_size             = 1
-  max_size             = 5
-  desired_capacity     = 1
+  max_size             = 10
+  desired_capacity     = 3
   launch_configuration = "${aws_launch_configuration.ecs.name}"
-
-  # load_balancers = ["${aws_alb.main.id}"]
 }
 
 resource "aws_launch_configuration" "ecs" {

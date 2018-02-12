@@ -3,7 +3,7 @@
     "cpu": 300,
     "essential": true,
     "image": "${image_url}",
-    "memory": 300,
+    "memoryReservation": 300,
     "name": "${container_name}",
     "environment": [
       {
