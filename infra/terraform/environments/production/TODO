@@ -7,7 +7,7 @@
 - [x] Elasticache
 - [x] Route53
 - [x] KMS
-- [ ] ECS - nginx
+- [x] ECS - nginx
 - [ ] ECS - sidekiq
 - [x] CloudFront
 - [x] S3

@@ -38,6 +38,7 @@ variable "image_urls" {
 
   default = {
     "rack_application" = "016559158979.dkr.ecr.ap-northeast-1.amazonaws.com/sample:latest"
+    "nginx-http2https" = "016559158979.dkr.ecr.ap-northeast-1.amazonaws.com/nginx_http2https:latest"
   }
 }
 
