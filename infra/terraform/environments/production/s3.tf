@@ -41,12 +41,12 @@ data "aws_iam_policy_document" "public-assets" {
   }
 
   statement {
-    sid    = "AllowCloudFrontToGetContent"
+    sid    = "AllowCloudFrontToGetObject"
     effect = "Allow"
 
     principals = {
-      type        = "CanonicalUser"
-      identifiers = ["${aws_cloudfront_origin_access_identity.public-assets.s3_canonical_user_id}"]
+      type        = "AWS"
+      identifiers = ["${aws_cloudfront_origin_access_identity.public-assets.iam_arn}"]
     }
 
     actions = [
